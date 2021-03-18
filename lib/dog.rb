@@ -31,12 +31,10 @@ class Dog
              INSERT INTO dogs (name, breed)
             VALUES(?,?)
             SQL
-            data = DB[:conn].execute(sql,self.name,self.breed).flatten
-            id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
+            data = DB[:conn].execute(sql,self.name,self.breed)
+            self.id = DB[:conn].execute("SELECT last_insert_rowid() FROM dogs")[0][0]
         end
         self
-        #new_dog = Dog.new(id:id, name:data[1],breed:data[2])
-        #binding.pry
     end
 
     def self.create(name:, breed:)
@@ -62,13 +60,13 @@ class Dog
     
     def self.find_or_create_by(name:, breed:)
        data = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? AND breed = ? LIMIT 1", name, breed)
-       if !data.empty?
-           data = data[0]
-           new_dog = Dog.new(id: data[0],name:data[1], breed:data[2]) 
-           #binding.pry
+       new_dog = nil
+       if  !data.empty?
+           dog_data = data[0]
+           #self.new_from_db(dog_data[0])
+           new_dog = Dog.new(id: dog_data[0],name:dog_data[1], breed:dog_data[2]) 
        else
           new_dog = self.create(name: name , breed: breed)
-          #binding.pry
        end
        new_dog
     end
